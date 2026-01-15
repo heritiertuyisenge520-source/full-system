@@ -1,0 +1,5 @@
+{
+  "name": "Imihigo Monitoring System",
+  "description": "A comprehensive monitoring platform for the Imihigo program, featuring hierarchical tracking of pillars, outputs, and performance indicators across quarters and months.",
+  "requestFramePermissions": []
+}
