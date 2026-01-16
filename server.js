@@ -5,4 +5,5 @@ const path = require('path');
 
 // Change to Backend directory and run the compiled server
 process.chdir(path.join(__dirname, 'Backend'));
-require('./Backend/dist/index.js');
+require('./dist/index.js');
+
