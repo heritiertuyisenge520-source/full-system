@@ -36,8 +36,10 @@ export interface IMonitoringEntry extends Document {
 export interface IUser extends Document {
     email: string;
     password: string;
-    role: 'Assign employee' | 'Planning director' | 'Unity director' | 'admin' | 'editor' | 'viewer';
+    role: string; // Position title - flexible to accept any position
     name: string;
+    firstName?: string;
+    lastName?: string;
     lastLogin?: Date;
     isActive?: boolean;
 }
@@ -127,8 +129,10 @@ export const EntryModel = mongoose.model<IMonitoringEntry>('Entry', MonitoringEn
 const UserSchema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['Assign employee', 'Planning director', 'Unity director', 'admin', 'editor', 'viewer'], default: 'Assign employee' },
+    role: { type: String, required: true }, // Position title
     name: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     lastLogin: { type: Date },
     isActive: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },

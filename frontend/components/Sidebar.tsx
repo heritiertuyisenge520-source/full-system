@@ -44,9 +44,21 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, entries, user, onLogout, 
   }, [entries]);
 
   const menuItems = [
+    // Dashboard at the top (available to non-Assign employee roles)
+    ...(user?.role !== 'Assign employee' ? [
+      {
+        id: 'analytics',
+        label: 'Dashboard',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        ),
+      }
+    ] : []),
     {
       id: 'fill',
-      label: user?.role === 'Assign employee' ? 'Submit the indicators' : 'Fill the Form',
+      label: 'Submit Progress',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -74,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, entries, user, onLogout, 
       },
       {
         id: 'targets',
-        label: 'Fixed Targets',
+        label: 'Indicators Target',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -96,15 +108,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, entries, user, onLogout, 
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        ),
-      },
-      {
-        id: 'analytics',
-        label: 'Analytics',
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         ),
       }
@@ -132,34 +135,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, entries, user, onLogout, 
             <span className="font-medium text-sm">{item.label}</span>
           </button>
         ))}
-
-        {/* Global Progress Widget */}
-        <div className="mt-8 pt-8 border-t border-slate-800 px-4">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Goal Achievement</p>
-          <div className="relative pt-1">
-            <div className="flex mb-2 items-center justify-between">
-              <div>
-                <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-200 bg-blue-900">
-                  Quarter Progress
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-semibold inline-block text-blue-200">
-                  {globalProgress}%
-                </span>
-              </div>
-            </div>
-            <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-800">
-              <div
-                style={{ width: `${Math.min(globalProgress, 100)}%` }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 transition-all duration-1000"
-              ></div>
-            </div>
-            <p className="text-[9px] text-slate-500 leading-tight italic">
-              Calculated based on cumulative monthly reported data vs fixed targets.
-            </p>
-          </div>
-        </div>
       </nav>
 
       <div className="p-6 mt-auto border-t border-slate-800 bg-slate-800/50">
@@ -182,16 +157,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, entries, user, onLogout, 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
             </svg>
           </button>
-        </div>
-
-        <div className="p-3 bg-slate-900/50 rounded-xl border border-slate-700/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Live System</span>
-            </div>
-            <span className="text-[9px] text-slate-500 font-medium">v1.2.0</span>
-          </div>
         </div>
       </div>
     </div>

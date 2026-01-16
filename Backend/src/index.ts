@@ -251,27 +251,43 @@ app.delete('/api/submissions/:id', async (req, res) => {
 
 app.post('/api/register', async (req, res) => {
     try {
-        const { email, name, role } = req.body;
+        const { email, name, firstName, lastName, role, password } = req.body;
+
         // Check if user already exists
         let user = await UserModel.findOne({ email });
         if (user) {
-            // Update existing user info
-            user.name = name;
-            user.role = role;
-            user.lastLogin = new Date();
-            await user.save();
-        } else {
-            // Create new user (temporary password until added later)
-            user = new UserModel({
-                email,
-                name,
-                role,
-                password: 'temp-password',
-                lastLogin: new Date()
-            });
-            await user.save();
+            return res.status(409).json({ message: 'User with this email already exists. Please login instead.' });
         }
-        res.status(200).json(user);
+
+        // Hash the password
+        const bcrypt = require('bcrypt');
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Create new user
+        user = new UserModel({
+            email,
+            name,
+            firstName,
+            lastName,
+            role,
+            password: hashedPassword,
+            lastLogin: new Date()
+        });
+        await user.save();
+
+        // Return user without password
+        const userResponse = {
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            lastLogin: user.lastLogin
+        };
+
+        res.status(201).json(userResponse);
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(400).json({ message: 'Error registering user' });
@@ -280,20 +296,115 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, name } = req.body;
+        const { email, password } = req.body;
         const user = await UserModel.findOne({ email });
 
-        if (user) {
-            // Update last login
-            user.lastLogin = new Date();
-            await user.save();
-            res.status(200).json(user);
-        } else {
-            res.status(404).json({ message: 'User not found. Please register first.' });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found. Please register first.' });
         }
+
+        // Verify password
+        const bcrypt = require('bcrypt');
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid password. Please try again.' });
+        }
+
+        // Update last login
+        user.lastLogin = new Date();
+        await user.save();
+
+        // Return user without password
+        const userResponse = {
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            lastLogin: user.lastLogin
+        };
+
+        res.status(200).json(userResponse);
     } catch (error) {
         console.error("Error logging in:", error);
         res.status(400).json({ message: 'Error logging in' });
+    }
+});
+
+// Verify User Exists (for password reset)
+app.post('/api/verify-user', async (req, res) => {
+    try {
+        const { email, role } = req.body;
+
+        // Validate input
+        if (!email || !role) {
+            return res.status(400).json({ message: 'Email and role are required' });
+        }
+
+        // Find user by email and role
+        const user = await UserModel.findOne({ email, role });
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'No user found with this email and role. Please check your details or register first.',
+                verified: false
+            });
+        }
+
+        // User found - return success (don't send sensitive data)
+        res.status(200).json({
+            message: 'User verified successfully',
+            verified: true,
+            userName: user.name // Return name for confirmation
+        });
+    } catch (error) {
+        console.error("Error verifying user:", error);
+        res.status(500).json({ message: 'Error verifying user. Please try again.' });
+    }
+});
+
+// Password Reset
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const { email, role, newPassword } = req.body;
+
+        // Validate input
+        if (!email || !role || !newPassword) {
+            return res.status(400).json({ message: 'Email, role, and new password are required' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+        }
+
+        // Find user by email and role
+        const user = await UserModel.findOne({ email, role });
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'No user found with this email and role combination. Please verify your details first.'
+            });
+        }
+
+        // Hash the new password
+        const bcrypt = require('bcrypt');
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update user's password
+        user.password = hashedPassword;
+        user.updatedAt = new Date();
+        await user.save();
+
+        res.status(200).json({
+            message: 'Password reset successful! You can now login with your new password.',
+            success: true
+        });
+    } catch (error) {
+        console.error("Error resetting password:", error);
+        res.status(500).json({ message: 'Error resetting password. Please try again.' });
     }
 });
 
