@@ -4,7 +4,9 @@
   "description": "Backend for Imihigo Monitoring System",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:ts": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "seed": "ts-node src/scripts/seed.ts"
   },
@@ -29,9 +31,9 @@
     "@types/express": "^4.17.21",
     "@types/helmet": "^0.0.48",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20.10.5",
-    "nodemon": "^3.0.2",
+    "@types/node": "^20.19.30",
+    "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }

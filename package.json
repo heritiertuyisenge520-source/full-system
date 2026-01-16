@@ -1,4 +1,11 @@
 {
+  "name": "full-system",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install --prefix Backend && npm run build --prefix Backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm start --prefix Backend",
+    "install-all": "npm install && npm install --prefix Backend && npm install --prefix frontend"
+  },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
