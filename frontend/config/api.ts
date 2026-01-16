@@ -1,11 +1,7 @@
-// API Configuration for different environments
+// API Configuration - using production backend
 const getApiUrl = (): string => {
-    // In production, use relative URL or environment variable
-    if (import.meta.env.PROD) {
-        return import.meta.env.VITE_API_URL || '/api';
-    }
-    // In development, use localhost
-    return import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // Use environment variable if set, otherwise use production backend URL
+    return import.meta.env.VITE_API_URL || 'https://full-system-8.onrender.com';
 };
 
 export const API_BASE_URL = getApiUrl();
